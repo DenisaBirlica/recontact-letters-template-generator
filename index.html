@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Recontact Letters Template Generator</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                }
+            }
+        }
+    </script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        .fade {
+            transition: opacity 0.3s ease-in-out;
+        }
+        .fade.hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 font-sans text-gray-800">
+    <div class="min-h-screen flex items-center justify-center p-4">
+        <div class="bg-white p-8 md:p-10 rounded-xl shadow-lg w-full max-w-2xl border border-gray-200">
+            <h1 class="text-3xl font-bold text-center text-gray-900 mb-8">Recontact Letters Template Generator</h1>
+            
+            <form id="generatorForm" class="space-y-8">
+                
+                <!-- Letter Type -->
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-2">Select Letter Type</label>
+                    <select id="letterType" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                        <option value="recontact">Recontact</option>
+                        <option value="apology">Apology</option>
+                        <option value="pt_invite">PT_InviteRecall (Product Test)</option>
+                        <option value="monthly">Monthly Screener</option>
+                    </select>
+                </div>
+
+                <!-- IDs -->
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-2">Respondent IDs</label>
+                    <textarea id="idsInput" rows="5" 
+                        class="w-full px-4 py-3 border rounded-lg placeholder-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                        placeholder="Example:&#10;550e8400-e29b-41d4-a716-446655440000&#10;3fa85f64-5717-4562-b3fc-2c963f66afa6&#10;f47ac10b-58cc-4372-a567-0e02b2c3d479"></textarea>
+                    <p id="idCount" class="mt-1 text-sm text-gray-500">0 IDs detected</p>
+                </div>
+
+                <!-- Recontact fields -->
+                <div id="recontactFields" class="fade hidden space-y-4">
+                    <h2 class="text-lg font-semibold text-gray-800 border-b pb-1">Recontact Details</h2>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Product Name <span class="text-gray-500 text-xs">(in the language of the field country)</span></label>
+                        <input 
+                            type="text" 
+                            id="productName" 
+                            autocomplete="off" 
+                            autocorrect="off" 
+                            spellcheck="false"
+                            class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                    </div>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Survey Points <span class="text-gray-500 text-xs">(extra points)</span></label>
+                            <input type="number" id="points" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Survey LOI</label>
+                            <input type="number" id="loi" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- PT Invite Recall fields -->
+                <div id="ptFields" class="fade hidden space-y-4">
+                    <h2 class="text-lg font-semibold text-gray-800 border-b pb-1">Product Test Invite Details</h2>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Product Category</label>
+                        <input type="text" id="productCategory" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Additional Instructions <span class="text-gray-500 text-xs">(optional)</span></label>
+                        <textarea id="additionalInstructions" rows="3" class="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"></textarea>
+                    </div>
+                </div>
+
+                <!-- Monthly Screener fields -->
+                <div id="monthlyFields" class="fade hidden space-y-4">
+                    <h2 class="text-lg font-semibold text-gray-800 border-b pb-1">Monthly Screener Details</h2>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Survey Points <span class="text-gray-500 text-xs">(extra points)</span></label>
+                            <input type="number" id="monthlyPoints" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Survey LOI</label>
+                            <input type="number" id="monthlyLoi" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Submit -->
+                <button type="submit" class="w-full bg-blue-600 text-white font-bold py-3 px-4 rounded-lg shadow-md hover:bg-blue-700 focus:ring-2 focus:ring-blue-500">
+                    Generate Excel File
+                </button>
+            </form>
+
+            <div id="messageBox" class="mt-4 p-4 rounded-lg hidden"></div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.0/xlsx.full.min.js"></script>
+    <script>
+        const letterTypeSelect = document.getElementById('letterType');
+        const recontactFields = document.getElementById('recontactFields');
+        const ptFields = document.getElementById('ptFields');
+        const monthlyFields = document.getElementById('monthlyFields');
+        const messageBox = document.getElementById('messageBox');
+        const idsInput = document.getElementById('idsInput');
+        const idCount = document.getElementById('idCount');
+
+        function toggleFields() {
+            [recontactFields, ptFields, monthlyFields].forEach(f => f.classList.add('hidden'));
+            if (letterTypeSelect.value === 'recontact') recontactFields.classList.remove('hidden');
+            if (letterTypeSelect.value === 'pt_invite') ptFields.classList.remove('hidden');
+            if (letterTypeSelect.value === 'monthly') monthlyFields.classList.remove('hidden');
+        }
+
+        function updateIdCount() {
+            const count = idsInput.value.split(/[\n,]+/)
+                .map(i => i.trim())
+                .filter(Boolean).length;
+            idCount.textContent = `${count} ID${count !== 1 ? 's' : ''} detected`;
+        }
+
+        idsInput.addEventListener('input', updateIdCount);
+        letterTypeSelect.addEventListener('change', toggleFields);
+        document.addEventListener('DOMContentLoaded', () => {
+            toggleFields();
+            updateIdCount();
+        });
+
+        function showMessage(msg, type) {
+            messageBox.textContent = msg;
+            messageBox.classList.remove('hidden', 'bg-red-100', 'text-red-800', 'bg-green-100', 'text-green-800');
+            messageBox.classList.add(type === 'error' ? 'bg-red-100' : 'bg-green-100', type === 'error' ? 'text-red-800' : 'text-green-800');
+        }
+
+        document.getElementById('generatorForm').addEventListener('submit', e => {
+            e.preventDefault();
+            const ids = idsInput.value.split(/[\n,]+/).map(i => i.trim()).filter(Boolean);
+            if (!ids.length) return showMessage('Please enter at least one Respondent ID.', 'error');
+
+            let data = [];
+            let fileName = '';
+
+            switch (letterTypeSelect.value) {
+                case 'recontact':
+                    const productName = document.getElementById('productName').value.trim();
+                    const points = document.getElementById('points').value.trim();
+                    const loi = document.getElementById('loi').value.trim();
+                    if (!productName || !points || !loi) return showMessage('Please fill all Recontact fields.', 'error');
+                    data = ids.map(id => ({ RespondentId: id, invitename: 'Recontact', ProductName: productName, SurveyLOI: loi, SurveyPoints: points }));
+                    fileName = 'Recontact.xlsx';
+                    break;
+                case 'apology':
+                    data = ids.map(id => ({ RespondentId: id, invitename: 'Apology' }));
+                    fileName = 'Apology.xlsx';
+                    break;
+                case 'pt_invite':
+                    const productCategory = document.getElementById('productCategory').value.trim();
+                    const additionalInstructions = document.getElementById('additionalInstructions').value.trim();
+                    if (!productCategory) return showMessage('Please enter Product Category.', 'error');
+                    data = ids.map(id => ({ RespondentId: id, invitename: 'PT_InviteRecall', ProductCategory: productCategory, ReminderVisibility: 'none', AdditionalInstructions: additionalInstructions }));
+                    fileName = 'PT_InviteRecall.xlsx';
+                    break;
+                case 'monthly':
+                    const monthlyPoints = document.getElementById('monthlyPoints').value.trim();
+                    const monthlyLoi = document.getElementById('monthlyLoi').value.trim();
+                    if (!monthlyPoints || !monthlyLoi) return showMessage('Please fill all Monthly Screener fields.', 'error');
+                    data = ids.map(id => ({ RespondentId: id, invitename: 'Recontact', ProductName: 'Waarden en levensstijlen', SurveyLOI: monthlyLoi, SurveyPoints: monthlyPoints }));
+                    fileName = 'Monthly_Screener.xlsx';
+                    break;
+            }
+
+            try {
+                const ws = XLSX.utils.json_to_sheet(data);
+                const wb = XLSX.utils.book_new();
+                XLSX.utils.book_append_sheet(wb, ws, "Sheet1");
+                XLSX.writeFile(wb, fileName);
+                showMessage('Excel file generated successfully!', 'success');
+            } catch (err) {
+                console.error(err);
+                showMessage('Error generating file.', 'error');
+            }
+        });
+    </script>
+</body>
+</html>
